@@ -1,790 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ColdCash.ph - AI Content Factory</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <style>
-                :root {
-            --bg: #050505;
-            --text: #f5f5f0;
-            --accent: #c9f31d;
-            --card: #111111;
-            --border: #2a2a2a;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: var(--bg); 
-            color: var(--text); 
-            line-height: 1.6; 
-            padding-bottom: 50px; 
-            background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-            background-size: 40px 40px;
-            background-position: -1px -1px;
-        }
-        h1, h2, h3, h4, .display { font-family: 'Space Grotesk', sans-serif; }
-        
-        header { padding: 20px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: rgba(5,5,5,0.8); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 50; }
-        .logo { font-size: 24px; font-weight: 700; font-family: 'Space Grotesk', sans-serif; letter-spacing: -0.02em; }
-        .logo span { color: var(--accent); }
-        
-        nav { display: flex; gap: 20px; padding: 15px 20px; border-bottom: 1px solid var(--border); overflow-x: auto; background: rgba(5,5,5,0.8); backdrop-filter: blur(10px); }
-        .tab-btn { background: none; border: none; color: #888; font-family: 'Space Grotesk', sans-serif; font-size: 16px; cursor: pointer; padding: 5px 0; white-space: nowrap; transition: color 0.2s; }
-        .tab-btn:hover { color: #fff; }
-        .tab-btn.active { color: var(--accent); border-bottom: 2px solid var(--accent); }
-        
-        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
-        .tab-content { display: none; animation: fadeIn 0.3s ease; }
-        .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .card { background: var(--card); border: 1px solid var(--border); padding: 24px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
-        .btn { background: var(--accent); color: #000; border: none; padding: 12px 24px; font-weight: 600; font-family: 'Space Grotesk', sans-serif; cursor: pointer; border-radius: 6px; display: inline-flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 0.05em; transition: all 0.2s ease; }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(201, 243, 29, 0.4); }
-        .btn-outline { background: transparent; color: var(--text); border: 1px solid var(--border); }
-        .btn-outline:hover { border-color: var(--accent); color: var(--accent); background: rgba(201, 243, 29, 0.05); box-shadow: none; }
-        
-        input[type="text"], input[type="password"], select { width: 100%; padding: 14px; background: #000; border: 1px solid var(--border); color: var(--text); border-radius: 6px; margin-bottom: 15px; font-family: 'Inter', sans-serif; transition: all 0.2s ease; }
-        input:focus, select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(201, 243, 29, 0.2); }
-        
-        .niche-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
-        .niche-tag { 
-            background: rgba(255, 255, 255, 0.03); 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            color: var(--text);
-            padding: 10px 20px; 
-            border-radius: 30px; 
-            cursor: pointer; 
-            font-size: 14px; 
-            font-weight: 500;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .niche-tag:hover { 
-            background: rgba(255, 255, 255, 0.08);
-            border-color: var(--accent); 
-            color: var(--accent); 
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(201, 243, 29, 0.15);
-        }
-        .niche-tag.active { 
-            background: var(--accent); 
-            border-color: var(--accent); 
-            color: #000; 
-            font-weight: 600;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(201, 243, 29, 0.3);
-        }
-        
-        .ad-slot { border: 1px dashed #555; padding: 20px; text-align: center; color: #555; margin: 20px 0; background: rgba(255,255,255,0.02); }
-        
-        .grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
-        @media(min-width: 600px) { .grid { grid-template-columns: 1fr 1fr; } }
-        
-        .quote-card { background: #1a1a2e; padding: 30px; border-radius: 8px; text-align: center; margin-bottom: 15px; position: relative; }
-        .quote-text { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 15px; }
-        .quote-author { font-size: 14px; opacity: 0.8; }
-        
-        .copy-btn { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); border: none; color: white; padding: 5px; border-radius: 4px; cursor: pointer; }
-        .copy-btn:hover { background: var(--accent); color: var(--bg); }
-        
-        .carousel-slide { background: var(--bg); border: 1px solid var(--border); padding: 15px; margin-bottom: 10px; border-radius: 4px; }
-        .carousel-slide h4 { color: var(--accent); margin-bottom: 5px; }
-        
-        .caption-box, .hashtag-box { background: var(--bg); border: 1px solid var(--border); padding: 15px; border-radius: 4px; margin-bottom: 15px; white-space: pre-wrap; font-size: 14px; }
-        
-        .stock-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
-        .stock-img { width: 100%; height: 150px; object-fit: cover; border-radius: 4px; }
-        
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 100; }
-        .modal { background: var(--card); padding: 30px; border-radius: 8px; max-width: 400px; width: 90%; max-height: 90vh; overflow-y: auto; text-align: center; border: 1px solid var(--accent); }
-        .modal.active { display: flex; }
-        
-        .loader { display: none; text-align: center; padding: 20px; color: var(--accent); }
-        .loader.active { display: block; }
-        
-        .hidden { display: none !important; }
-        
-        .guide-section { margin-bottom: 30px; }
-        .guide-section h3 { color: var(--accent); margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
-        .guide-section ul { list-style-position: inside; margin-left: 10px; }
-        .guide-section li { margin-bottom: 8px; }
-        .layout-btn, .align-btn, .bg-source-btn {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            color: var(--text);
-            padding: 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            transition: all 0.2s;
-        }
-        .layout-btn:hover, .align-btn:hover, .bg-source-btn:hover {
-            border-color: var(--accent);
-            background: rgba(255,255,255,0.05);
-        }
-        .layout-btn.active, .align-btn.active, .bg-source-btn.active, .cc-ratio-btn.active {
-            border-color: var(--accent);
-            background: rgba(255,255,255,0.1);
-            color: var(--accent);
-        }
-    </style>
-</head>
-<body>
 
-    <header>
-        <div class="logo">ColdCash<span>.ph</span></div>
-        <div style="font-size: 14px; color: var(--accent); font-weight: bold;"><i data-lucide="crown" style="width: 16px; height: 16px; display: inline-block; vertical-align: text-bottom;"></i> PRO Active</div>
-    </header>
-
-    <nav>
-        <button class="tab-btn active" data-tab="generator" id="nav-generator">Generator</button>
-        <button class="tab-btn" data-tab="carousel-cover" id="nav-carousel-cover">Carousel Covers</button>
-        <button class="tab-btn" data-tab="saved" id="nav-saved">Saved</button>
-        <button class="tab-btn" data-tab="guide" id="nav-guide">How You Get Paid</button>
-        <button class="tab-btn" data-tab="settings" id="nav-settings">Settings</button>
-    </nav>
-
-    <!-- AD SLOT 1: TOP BANNER -->
-    <div class="container">
-        <div class="ad-slot">
-            <!-- AdSense Code Here -->
-            <p>Ad Slot 1: Top Banner</p>
-        </div>
-    </div>
-
-    <div class="container">
-        
-        <!-- GENERATOR TAB -->
-        <div id="generator" class="tab-content active">
-            <div class="card">
-                <h2 style="margin-bottom: 15px;">1. Select Your Niche</h2>
-                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                    <input type="text" id="niche-input" placeholder="Type your niche (e.g. Dark Psychology)..." style="margin-bottom: 0;">
-                    <button class="btn btn-outline" id="suggest-niches-btn" style="white-space: nowrap; padding: 12px 20px;">
-                        <i data-lucide="sparkles" style="width: 16px; height: 16px;"></i> AI Suggest
-                    </button>
-                </div>
-                <div style="margin-bottom: 15px;">
-                    <input type="text" id="caption-tone-input" placeholder="Caption Tone / Audience (e.g. Humorous, Professional, Gen Z)..." style="margin-bottom: 0;">
-                </div>
-                <div id="niche-suggestions" style="margin-bottom: 15px; display: flex; flex-wrap: wrap; gap: 8px;"></div>
-                <div class="niche-tags">
-                    <button class="niche-tag">Dark Psychology</button>
-                    <button class="niche-tag">Wealth & Finance</button>
-                    <button class="niche-tag">Stoicism</button>
-                    <button class="niche-tag">Entrepreneurship</button>
-                    <button class="niche-tag">Deep & Aesthetic</button>
-                    <button class="niche-tag">Sigma Mindset</button>
-                    <button class="niche-tag">Fitness & Gym</button>
-                    <button class="niche-tag">Relationships</button>
-                    <button class="niche-tag">Mindfulness</button>
-                    <button class="niche-tag">Productivity</button>
-                    <button class="niche-tag">Leadership</button>
-                    <button class="niche-tag">Self-Improvement</button>
-                    <button class="niche-tag">Discipline</button>
-                    <button class="niche-tag">Mental Health</button>
-                    <button class="niche-tag">Lookmaxxing</button>
-                    <button class="niche-tag">NoFap/Semen Retention</button>
-                    <button class="niche-tag" style="border-color: #8b0000; color: #fff; background: rgba(139, 0, 0, 0.15);"><i data-lucide="flame" style="width: 14px; height: 14px; margin-right: 4px; display: inline-block; vertical-align: middle;"></i>Hardest Quotes Ever</button>
-                </div>
-
-                <div id="pexels-filters" style="margin-top: 15px; margin-bottom: 15px; padding: 15px; background: #111; border-radius: 8px; border: 1px solid #333;">
-                    <h4 style="margin-bottom: 10px; font-size: 14px; color: #888;">Pexels Stock Filters (Optional)</h4>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <input type="text" id="pexels-query" placeholder="Custom search (e.g. luxury cars)..." style="grid-column: span 2; margin-bottom: 0;">
-                        <select id="pexels-orientation" style="width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 4px; font-family: 'Inter', sans-serif; outline: none;">
-                            <option value="">Any Aspect Ratio</option>
-                            <option value="portrait">Vertical (Reels/TikTok)</option>
-                            <option value="landscape">Horizontal (YouTube)</option>
-                            <option value="square">Square (Instagram Post)</option>
-                        </select>
-                        <select id="pexels-color" style="width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 4px; font-family: 'Inter', sans-serif; outline: none;">
-                            <option value="">Any Color / Vibe</option>
-                            <option value="warm">Warm Tones</option>
-                            <option value="cool">Cool Tones</option>
-                            <option value="black">Dark / Black</option>
-                            <option value="white">White / Minimal</option>
-                            <option value="gray">Gray / Moody</option>
-                            <option value="red">Red / Aggressive</option>
-                            <option value="blue">Blue / Calm</option>
-                            <option value="green">Green / Wealth</option>
-                        </select>
-                        <select id="pexels-per-page" style="width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 4px; font-family: 'Inter', sans-serif; outline: none;">
-                            <option value="6">6 Images</option>
-                            <option value="12">12 Images</option>
-                            <option value="24">24 Images</option>
-                            <option value="40">40 Images (Max)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <button id="generate-btn" class="btn" style="width: 100%; justify-content: center;">
-                    <i data-lucide="zap"></i> Generate Daily Content
-                </button>
-            </div>
-
-            <!-- AD SLOT 3: BETWEEN GENERATOR AND RESULTS -->
-            <div class="ad-slot">
-                <!-- AdSense Code Here -->
-                <p>Ad Slot 3: Between Generator and Results</p>
-            </div>
-
-            <div id="loader" class="loader">
-                <i data-lucide="loader-2" class="lucide-spin" style="animation: spin 2s linear infinite;"></i>
-                <p style="margin-top: 10px; font-family: 'Space Grotesk';">Generating your content factory...</p>
-            </div>
-
-            <div id="results" class="hidden">
-                <div style="display: flex; justify-content: flex-end; margin-bottom: 15px;">
-                    <input type="file" id="global-bg-upload" accept="image/*" style="display: none;" onchange="handleGlobalBgUpload(this)">
-                    <button class="btn" onclick="document.getElementById('global-bg-upload').click()">
-                        <i data-lucide="upload" style="width: 16px; height: 16px; margin-right: 8px;"></i> Upload Global Background
-                    </button>
-                </div>
-
-                <div class="card">
-                    <h3 style="margin-bottom: 15px; color: var(--accent);">A) Quote Cards</h3>
-                    <p id="palette-suggestion" style="font-size: 14px; margin-bottom: 15px; color: #888;">Suggested palette: #0d0d0d, #1a1a2e. Font: Space Grotesk.</p>
-                    <div id="quotes-container"></div>
-                    
-                    <!-- AI Pick Section -->
-                    <div id="ai-pick-section" style="margin-top: 20px; padding: 20px; border: 1px solid var(--accent); border-radius: 8px; background: rgba(0,0,0,0.2); display: none;">
-                        <h4 style="color: var(--accent); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
-                            <i data-lucide="sparkles" style="width: 18px; height: 18px;"></i> AI Pick: Best Quote to Post
-                        </h4>
-                        <p style="font-size: 14px; color: #aaa; margin-bottom: 15px;">Select a platform to get the best quote recommendation based on psychological triggers.</p>
-                        
-                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                            <button class="btn btn-outline ai-pick-platform-btn" data-platform="TikTok" onclick="selectAiPickPlatform(this)">TikTok</button>
-                            <button class="btn btn-outline ai-pick-platform-btn" data-platform="Instagram" onclick="selectAiPickPlatform(this)">Instagram</button>
-                            <button class="btn btn-outline ai-pick-platform-btn" data-platform="YouTube" onclick="selectAiPickPlatform(this)">YouTube</button>
-                        </div>
-                        
-                        <button id="get-ai-pick-btn" class="btn" style="display: none; width: 100%; justify-content: center;" onclick="getAiPick()">Get AI Pick</button>
-                        
-                        <div id="ai-pick-loading" style="display: none; text-align: center; padding: 20px;">
-                            <div class="loader" style="margin: 0 auto 10px;"></div>
-                            <p style="font-size: 14px; color: #888;">Analyzing quotes for psychological impact...</p>
-                        </div>
-                        
-                        <div id="ai-pick-result" style="display: none; margin-top: 20px; background: #111; border: 1px solid var(--border); border-radius: 8px; padding: 15px;">
-                            <!-- Result will be injected here -->
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h3 style="margin-bottom: 15px; color: var(--accent);">B) Carousel Script</h3>
-                    <div id="carousel-container"></div>
-                    <div style="display: flex; gap: 10px; margin-top: 10px;">
-                        <button class="btn" onclick="copyText('carousel-container', this)"><i data-lucide="copy" style="width: 16px; height: 16px;"></i> Copy Carousel</button>
-                        <button class="btn btn-outline" onclick="sendCarouselToBuilder()">Send to Builder</button>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h3 style="margin-bottom: 15px; color: var(--accent);">C) Captions</h3>
-                    <div id="captions-container"></div>
-                </div>
-
-                <div class="card">
-                    <h3 style="margin-bottom: 15px; color: var(--accent);">D) Hashtag Sets</h3>
-                    <div id="hashtags-container" class="hashtag-box"></div>
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn" onclick="copyText('hashtags-container', this)"><i data-lucide="copy" style="width: 16px; height: 16px;"></i> Copy All Hashtags</button>
-                        <button class="btn btn-outline" onclick="saveContent(this, 'hashtags', document.getElementById('hashtags-container').innerText)">Save Hashtags</button>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h3 style="margin-bottom: 15px; color: var(--accent);">E) Short-Form Video Scripts</h3>
-                    <p style="font-size: 14px; margin-bottom: 15px; color: #888;">Templates for Reels, TikToks, and Shorts.</p>
-                    <div id="video-scripts-container"></div>
-                </div>
-
-                <div class="card">
-                    <h3 style="margin-bottom: 15px; color: var(--accent);">F) Stock Content (B-Roll)</h3>
-                    <p style="font-size: 14px; margin-bottom: 15px; color: #888;">Use these as backgrounds for quotes or reels.</p>
-                    <div id="stock-container" class="stock-grid"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- SAVED TAB -->
-        <div id="saved" class="tab-content">
-            <div class="card">
-                <h2 style="margin-bottom: 20px;">Your Saved Content</h2>
-                <div id="saved-container">
-                    <!-- Populated by JS -->
-                </div>
-            </div>
-        </div>
-
-        <!-- GUIDE TAB -->
-        <div id="guide" class="tab-content">
-            <div class="card">
-                <h2 style="margin-bottom: 20px;">Monetization Guide</h2>
-                
-                <div class="guide-section">
-                    <h3>1. Instagram Bio Link Strategy</h3>
-                    <p>Never send traffic directly to an affiliate link. Use Linktree (free) to link to a free Gumroad product. Collect their email, then upsell a $7-$27 PDF or course.</p>
-                </div>
-
-                <div class="guide-section">
-                    <h3>2. Faceless Affiliate Niches That Pay</h3>
-                    <ul>
-                        <li><strong>Wealth/Hustle:</strong> Digistore24 (Make Money Online courses)</li>
-                        <li><strong>Health/Fitness:</strong> ClickBank (Supplements, workout plans)</li>
-                        <li><strong>Stoicism/Mindset:</strong> Amazon Associates (Books), Gumroad (Notion templates)</li>
-                        <li><strong>Aesthetic/Lifestyle:</strong> Stan Store (Presets, planners)</li>
-                    </ul>
-                </div>
-
-                <div class="guide-section">
-                    <h3>3. The ColdCash Posting Schedule</h3>
-                    <p>Post 3 times a day for maximum reach:</p>
-                    <ul>
-                        <li><strong>6:00 AM PHT:</strong> Motivational Quote Card (Single image)</li>
-                        <li><strong>12:00 PM PHT:</strong> Value Carousel (5-7 slides)</li>
-                        <li><strong>7:00 PM PHT:</strong> Faceless Reel (Stock video + text overlay)</li>
-                    </ul>
-                </div>
-
-                <div class="guide-section">
-                    <h3>4. How to Make Reels Without Recording</h3>
-                    <p>Use CapCut (free). Download a dark, moody stock video from the Generator tab. Add your quote text in the center using the "Space Grotesk" font. Add a trending audio on Instagram. No face, no voice needed.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- SETTINGS TAB -->
-        <div id="settings" class="tab-content">
-            <div class="card">
-                <h2 style="margin-bottom: 20px;">Settings</h2>
-                
-                <div style="margin-bottom: 20px;">
-                    <label style="display: block; margin-bottom: 5px; color: var(--accent);">Pexels API Key (Free)</label>
-                    <p style="font-size: 12px; color: #888; margin-bottom: 10px;">Required for stock video/image generation. Get it free at pexels.com/api</p>
-                    <input type="password" id="pexels-key" placeholder="Enter Pexels API Key...">
-                    <button class="btn btn-outline" id="save-pexels">Save Key</button>
-                    <div id="pexels-feedback" style="margin-top: 10px; font-size: 14px; display: none;"></div>
-                </div>
-
-                <div style="margin-bottom: 20px; padding-top: 20px; border-top: 1px solid var(--border);">
-                    <h3 style="margin-bottom: 10px;">Usage Stats</h3>
-                    <p>Generations used today: <span id="stats-used">0</span> (Unlimited)</p>
-                    <p style="font-size: 12px; color: #888; margin-top: 5px;">Resets at midnight local time.</p>
-                </div>
-
-                <div style="padding-top: 20px; border-top: 1px solid var(--border); text-align: center;">
-                    <h3 style="margin-bottom: 10px; color: var(--accent);"><i data-lucide="crown" style="width: 20px; height: 20px; display: inline-block; vertical-align: text-bottom;"></i> ColdCash PRO Active</h3>
-                    <p style="margin-bottom: 15px; font-size: 14px;">You have unlimited generations and premium features unlocked as the owner.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- CAROUSEL COVER TAB -->
-        <div id="carousel-cover" class="tab-content">
-            <div class="card" style="max-width: 900px; margin: 0 auto;">
-                <h2 style="margin-bottom: 15px;">Minimalist Carousel Cover Builder</h2>
-                
-                <div style="display: flex; flex-wrap: wrap; gap: 20px;">
-                    <!-- Left Panel: Controls -->
-                    <div style="flex: 1; min-width: 300px;">
-                        <div style="margin-bottom: 20px;">
-                            <label style="display: block; margin-bottom: 8px; color: #888; font-size: 14px;">Backgrounds</label>
-                            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                                <button class="btn btn-outline" onclick="document.getElementById('cc-bg-upload').click()" style="padding: 8px 12px; font-size: 12px;">
-                                    <i data-lucide="upload" style="width: 14px; height: 14px;"></i> Upload Custom Background
-                                </button>
-                                <input type="file" id="cc-bg-upload" accept="image/*" style="display: none;" onchange="handleCcBgUpload(this)">
-                            </div>
-                            <div id="cc-backgrounds" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 10px;">
-                                <!-- Background options will be injected here -->
-                            </div>
-                            <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                <span style="font-size: 12px; color: #888;">Dark Overlay (Opacity)</span>
-                                <span id="cc-bg-overlay-val" style="font-size: 12px; color: var(--accent);">0%</span>
-                            </div>
-                            <input type="range" id="cc-bg-overlay-slider" min="0" max="90" value="0" step="5" style="width: 100%;">
-                        </div>
-
-                        <div style="margin-bottom: 20px;">
-                            <label style="display: block; margin-bottom: 8px; color: #888; font-size: 14px;">Slide Title</label>
-                            <textarea id="cc-title-input" rows="3" style="width: 100%; padding: 10px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 4px; font-family: 'Inter', sans-serif; outline: none; resize: vertical;" placeholder="Enter slide title..."></textarea>
-                            
-                            <div style="display: flex; gap: 15px; margin-top: 10px; align-items: center; flex-wrap: wrap;">
-                                <div style="flex: 1; min-width: 120px;">
-                                    <span style="font-size: 12px; color: #888; margin-bottom: 5px; display: block;">Font Family</span>
-                                    <select id="cc-font-family-select" style="width: 100%; padding: 6px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 4px; font-size: 12px; outline: none;">
-                                        <option value="'Inter', sans-serif">Inter (Clean)</option>
-                                        <option value="'Space Grotesk', sans-serif">Space Grotesk (Tech)</option>
-                                        <option value="'Playfair Display', serif">Playfair (Elegant)</option>
-                                        <option value="'Outfit', sans-serif">Outfit (Modern)</option>
-                                    </select>
-                                </div>
-                                <div style="flex: 1; min-width: 120px;">
-                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                                        <span style="font-size: 12px; color: #888;">Font Size</span>
-                                        <span id="cc-font-size-val" style="font-size: 12px; color: var(--accent);">32px</span>
-                                    </div>
-                                    <input type="range" id="cc-font-size-slider" min="16" max="72" value="32" style="width: 100%;">
-                                </div>
-                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <span style="font-size: 12px; color: #888; margin-bottom: 5px;">Color</span>
-                                    <input type="color" id="cc-text-color-picker" value="#111111" style="width: 30px; height: 30px; border: none; background: none; cursor: pointer; padding: 0;">
-                                </div>
-                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <span style="font-size: 12px; color: #888; margin-bottom: 5px;">Reset</span>
-                                    <button id="cc-reset-color-btn" class="btn btn-outline" style="padding: 4px 8px; font-size: 12px;" title="Reset to default color"><i data-lucide="rotate-ccw" style="width: 14px; height: 14px;"></i></button>
-                                </div>
-                            </div>
-                            
-                            <div style="display: flex; gap: 15px; margin-top: 10px; align-items: center; flex-wrap: wrap;">
-                                <div style="flex: 1; min-width: 120px;">
-                                    <span style="font-size: 12px; color: #888; margin-bottom: 5px; display: block;">Text Effect</span>
-                                    <select id="cc-text-effect-select" style="width: 100%; padding: 6px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 4px; font-size: 12px; outline: none;">
-                                        <option value="none">None</option>
-                                        <option value="shadow-subtle">Subtle Shadow</option>
-                                        <option value="shadow-strong">Strong Shadow</option>
-                                        <option value="glow">Glow</option>
-                                        <option value="outline">Outline</option>
-                                    </select>
-                                </div>
-                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <span style="font-size: 12px; color: #888; margin-bottom: 5px;">Effect Color</span>
-                                    <input type="color" id="cc-effect-color-picker" value="#000000" style="width: 30px; height: 30px; border: none; background: none; cursor: pointer; padding: 0;">
-                                </div>
-                            </div>
-                        </div>
-
-                        <div style="margin-bottom: 20px; display: flex; gap: 10px;">
-                            <div style="flex: 1;">
-                                <label style="display: block; margin-bottom: 8px; color: #888; font-size: 14px;">Slide Number (e.g. 01 / 05)</label>
-                                <input type="text" id="cc-number-input" style="width: 100%; padding: 10px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 4px; font-family: 'Inter', sans-serif; outline: none;" placeholder="Optional">
-                            </div>
-                            <div style="flex: 1;">
-                                <label style="display: block; margin-bottom: 8px; color: #888; font-size: 14px;">Brand Name / Handle</label>
-                                <input type="text" id="cc-brand-input" style="width: 100%; padding: 10px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 4px; font-family: 'Inter', sans-serif; outline: none;" placeholder="@yourhandle">
-                            </div>
-                        </div>
-
-                        <div style="margin-bottom: 20px;">
-                            <label style="display: block; margin-bottom: 8px; color: #888; font-size: 14px;">Aspect Ratio</label>
-                            <div style="display: flex; gap: 10px;">
-                                <button class="btn btn-outline cc-ratio-btn active" data-ratio="1:1" style="flex: 1;">1:1 (Square)</button>
-                                <button class="btn btn-outline cc-ratio-btn" data-ratio="9:16" style="flex: 1;">9:16 (Portrait)</button>
-                            </div>
-                        </div>
-                        
-                        <div style="margin-bottom: 20px;">
-                            <label style="display: block; margin-bottom: 8px; color: #888; font-size: 14px;">Export Resolution</label>
-                            <select id="cc-export-res" class="input" style="width: 100%;">
-                                <option value="1080">Full HD (1080p Width)</option>
-                                <option value="2160">4K (2160p Width)</option>
-                            </select>
-                        </div>
-
-                        <button id="cc-download-btn" class="btn" style="width: 100%; justify-content: center; margin-bottom: 10px;">
-                            <i data-lucide="download" style="width: 18px; height: 18px; margin-right: 8px;"></i> Download Slide
-                        </button>
-                    </div>
-
-                    <!-- Right Panel: Preview -->
-                    <div style="flex: 1; min-width: 300px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start;">
-                        <div id="cc-preview-container" style="width: 100%; max-width: 400px; aspect-ratio: 1/1; background: #F5F5F0; position: relative; overflow: hidden; border: 1px solid var(--border); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 40px; text-align: center; transition: aspect-ratio 0.3s;">
-                            <div id="cc-preview-bg" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0; background: #F5F5F0;"></div>
-                            <div id="cc-preview-overlay" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 0; background: rgba(0,0,0,0); pointer-events: none;"></div>
-                            
-                            <div id="cc-preview-number" style="position: absolute; top: 30px; left: 30px; z-index: 1; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #111111; opacity: 0.6;">01 / 05</div>
-                            
-                            <div id="cc-preview-title" style="position: relative; z-index: 1; font-family: 'Inter', sans-serif; font-size: 32px; font-weight: 600; color: #111111; line-height: 1.3; white-space: pre-wrap; word-break: break-word;">Slide Title</div>
-                            
-                            <div id="cc-preview-brand" style="position: absolute; bottom: 30px; left: 0; right: 0; z-index: 1; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 500; color: #111111; opacity: 0.6; text-align: center;">@yourhandle</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Slide Strip -->
-                <div style="margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <h3 style="font-size: 16px;">Carousel Slides (<span id="cc-slide-count">1</span>/10)</h3>
-                        <button id="cc-add-slide-btn" class="btn btn-outline" style="padding: 8px 15px; font-size: 12px;">
-                            <i data-lucide="plus" style="width: 14px; height: 14px; margin-right: 5px;"></i> Add Slide
-                        </button>
-                    </div>
-                    <div id="cc-slide-strip" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px;">
-                        <!-- Slide thumbnails will go here -->
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- AD SLOT 2: SIDEBAR / BOTTOM -->
-        <div class="ad-slot">
-            <!-- AdSense Code Here -->
-            <p>Ad Slot 2: Bottom Banner</p>
-        </div>
-
-    </div>
-
-    <!-- TUTORIAL OVERLAY -->
-    <div id="tutorial-overlay" class="modal-overlay" style="background: transparent; z-index: 10000; display: none; align-items: center; justify-content: center;">
-        <div id="tutorial-box" style="background: var(--card-bg); border: 2px solid var(--accent); padding: 25px; border-radius: 12px; width: 320px; position: relative; box-shadow: 0 0 30px rgba(0,210,255,0.3); z-index: 10001;">
-            <div id="tutorial-step-indicator" style="position: absolute; top: -15px; left: 20px; background: var(--accent); color: #000; padding: 2px 10px; border-radius: 10px; font-size: 12px; font-weight: bold;">Step 1/5</div>
-            <h3 id="tutorial-title" style="margin-bottom: 10px; color: var(--accent);">Welcome to ColdCash!</h3>
-            <p id="tutorial-text" style="font-size: 14px; line-height: 1.6; margin-bottom: 20px;">Let's take a quick tour to show you how to build your content empire.</p>
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <button class="btn btn-outline" style="padding: 8px 15px; font-size: 12px;" onclick="skipTutorial()">Skip Tour</button>
-                <button class="btn" style="padding: 8px 20px; font-size: 14px;" onclick="nextTutorialStep()" id="tutorial-next-btn">Next <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i></button>
-            </div>
-        </div>
-        <div id="tutorial-highlight" style="position: fixed; border-radius: 8px; box-shadow: 0 0 0 9999px rgba(0,0,0,0.85); pointer-events: none; z-index: -1; transition: all 0.3s ease;"></div>
-    </div>
-
-    <!-- FREEMIUM MODAL -->
-    <div id="freemium-modal" class="modal-overlay">
-        <div class="modal">
-            <h2 style="color: var(--accent); margin-bottom: 15px;">Daily Limit Reached</h2>
-            <p style="margin-bottom: 20px;">You've hit your 3 free generations for today. Upgrade to ColdCash PRO for unlimited access, or continue with limited output.</p>
-            <div style="display: flex; flex-direction: column; gap: 10px;">
-                <button class="btn" style="justify-content: center;" onclick="showToast('PRO features coming soon!', 'info')">Upgrade to PRO</button>
-                <button class="btn btn-outline" id="continue-limited" style="justify-content: center;">Continue (Limited Output)</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- VIDEO LOADER MODAL -->
-    <div id="video-loader-modal" class="modal-overlay" style="backdrop-filter: blur(8px); background: rgba(0,0,0,0.85); display: none;">
-        <div class="modal" style="text-align: center; position: relative; overflow: hidden; border: 1px solid var(--accent); box-shadow: 0 0 40px rgba(201, 243, 29, 0.15);">
-            <!-- Subtle background animation element -->
-            <div style="position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(201,243,29,0.08) 0%, transparent 60%); animation: rotateBg 15s linear infinite; z-index: 0; pointer-events: none;"></div>
-            
-            <div style="position: relative; z-index: 1;">
-                <div style="position: relative; display: inline-block; margin-bottom: 20px;">
-                    <i data-lucide="film" style="width: 48px; height: 48px; color: var(--accent); animation: pulse 2s infinite;"></i>
-                    <i data-lucide="loader-2" class="lucide-spin" style="position: absolute; top: -10px; right: -10px; width: 24px; height: 24px; color: #fff; animation: spin 1.5s linear infinite;"></i>
-                </div>
-                <h2 style="margin-bottom: 10px; font-family: 'Space Grotesk', sans-serif; letter-spacing: -0.5px;">Rendering Reel...</h2>
-                <p style="color: #aaa; font-size: 14px; margin-bottom: 25px;">Synthesizing audio and visual elements.</p>
-                
-                <div style="position: relative; width: 100%; background: #222; height: 12px; border-radius: 6px; overflow: hidden; border: 1px solid #333;">
-                    <div id="video-progress" style="width: 0%; height: 100%; background: linear-gradient(90deg, #8ca814 0%, var(--accent) 100%); box-shadow: 0 0 10px rgba(201,243,29,0.4); transition: width 0.1s linear; position: relative; overflow: hidden;">
-                        <!-- Animated stripes -->
-                        <div style="position: absolute; top: 0; left: 0; bottom: 0; right: 0; background-image: linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent); background-size: 1rem 1rem; animation: moveStripes 1s linear infinite;"></div>
-                    </div>
-                </div>
-                <div id="video-progress-text" style="margin-top: 10px; font-size: 14px; font-family: 'Space Grotesk', sans-serif; color: var(--accent); font-weight: bold;">0%</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- VIDEO OPTIONS MODAL -->
-    <div id="video-options-modal" class="modal-overlay" style="backdrop-filter: blur(8px); background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 10000;">
-        <div class="modal" style="width: 400px; border: 1px solid var(--border);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif;">Export Reel</h2>
-                <button class="btn btn-outline" style="padding: 5px;" onclick="closeVideoModal()"><i data-lucide="x" style="width: 16px; height: 16px;"></i></button>
-            </div>
-            
-            <div style="margin-bottom: 15px; text-align: center;">
-                <canvas id="video-preview-canvas" width="270" height="480" style="width: 100%; max-width: 200px; height: auto; border-radius: 8px; background: #000; border: 1px solid var(--border); display: none; margin: 0 auto 10px auto;"></canvas>
-                <button id="preview-video-btn" class="btn btn-outline" style="width: 100%; justify-content: center; margin-bottom: 5px;" onclick="startVideoPreview()">
-                    <i data-lucide="play" style="width: 16px; height: 16px; margin-right: 8px;"></i> Preview Animation & Audio
-                </button>
-            </div>
-
-            <div style="margin-bottom: 15px; text-align: left; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid var(--border);">
-                <label style="display: block; margin-bottom: 5px; color: #888; font-size: 14px;">Presets</label>
-                <div style="display: flex; gap: 8px;">
-                    <select id="video-preset-select" style="flex: 1; padding: 10px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 4px; font-family: 'Inter', sans-serif; outline: none;" onchange="applyVideoPreset()">
-                        <option value="">-- Select Preset --</option>
-                    </select>
-                    <button class="btn btn-outline" style="padding: 10px;" onclick="saveVideoPreset()" title="Save Current Settings as Preset">
-                        <i data-lucide="save" style="width: 16px; height: 16px;"></i>
-                    </button>
-                    <button class="btn btn-outline" style="padding: 10px; color: #ff4444; border-color: rgba(255,68,68,0.3);" onclick="deleteVideoPreset()" title="Delete Selected Preset">
-                        <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
-                    </button>
-                </div>
-            </div>
-            
-            <div style="margin-bottom: 15px; text-align: left;">
-                <label style="display: block; margin-bottom: 5px; color: #888; font-size: 14px;">Custom Background (Optional)</label>
-                <input type="file" id="video-bg-upload" accept="image/*" style="width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 4px; font-family: 'Inter', sans-serif; outline: none;" onchange="handleVideoBgUpload(this)">
-            </div>
-
-            <div style="margin-bottom: 15px; text-align: left;">
-                <label style="display: block; margin-bottom: 5px; color: #888; font-size: 14px;">Animation Style</label>
-                <select id="video-anim-style" style="width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 4px; font-family: 'Inter', sans-serif; outline: none;" onchange="if(document.getElementById('video-preview-canvas').style.display !== 'none') startVideoPreview()">
-                    <option value="fade-up">Fade Up (Cinematic)</option>
-                    <option value="typewriter">Typewriter</option>
-                    <option value="pop-in">Pop In</option>
-                </select>
-            </div>
-
-            <div style="margin-bottom: 15px; text-align: left;">
-                <label style="display: block; margin-bottom: 5px; color: #888; font-size: 14px;">Video Duration</label>
-                <div style="display: flex; gap: 8px;">
-                    <select id="video-duration" style="flex: 1; padding: 12px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 4px; font-family: 'Inter', sans-serif; outline: none;" onchange="document.getElementById('video-custom-duration').style.display = this.value === 'custom' ? 'block' : 'none'; if(document.getElementById('video-preview-canvas').style.display !== 'none') startVideoPreview()">
-                        <option value="5">5 Seconds</option>
-                        <option value="10">10 Seconds</option>
-                        <option value="15">15 Seconds</option>
-                        <option value="30">30 Seconds</option>
-                        <option value="custom">Custom...</option>
-                    </select>
-                    <input type="number" id="video-custom-duration" style="width: 80px; padding: 12px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 4px; font-family: 'Inter', sans-serif; outline: none; display: none;" min="1" max="300" value="20" onchange="if(document.getElementById('video-preview-canvas').style.display !== 'none') startVideoPreview()">
-                </div>
-            </div>
-
-            <div style="margin-bottom: 15px; text-align: left;">
-                <label style="display: block; margin-bottom: 5px; color: #888; font-size: 14px;">Background Music</label>
-                <select id="video-music-style" style="width: 100%; padding: 12px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 4px; font-family: 'Inter', sans-serif; outline: none;" onchange="document.getElementById('internet-audio-section').style.display = this.value === 'internet' ? 'block' : 'none'; if(document.getElementById('video-preview-canvas').style.display !== 'none') startVideoPreview()">
-                    <option value="ambient">Ambient Drone</option>
-                    <option value="lofi">Lo-Fi Beat</option>
-                    <option value="synthwave">Synthwave Arp</option>
-                    <option value="phonk">Phonk Drift</option>
-                    <option value="cinematic">Cinematic Epic</option>
-                    <option value="internet">Search Internet Audio (iTunes)</option>
-                    <option value="none">No Music</option>
-                </select>
-            </div>
-
-            <div id="internet-audio-section" style="display: none; margin-bottom: 25px; text-align: left; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; border: 1px solid var(--border);">
-                <label style="display: block; margin-bottom: 5px; color: #888; font-size: 14px;">Search Track or Artist</label>
-                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                    <input type="text" id="internet-audio-query" placeholder="e.g., Lofi hip hop" style="flex: 1; padding: 10px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 4px; font-family: 'Inter', sans-serif; outline: none;">
-                    <button class="btn btn-outline" onclick="searchInternetAudio()" style="padding: 10px;"><i data-lucide="search" style="width: 16px; height: 16px;"></i></button>
-                </div>
-                <div id="internet-audio-results" style="max-height: 150px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;"></div>
-                <input type="hidden" id="selected-internet-audio-url" value="">
-            </div>
-
-            <button id="confirm-export-btn" class="btn" style="width: 100%; justify-content: center;">
-                <i data-lucide="download" style="width: 18px; height: 18px; margin-right: 8px;"></i> Render Video
-            </button>
-        </div>
-    </div>
-
-    <!-- Image Export Modal -->
-    <div id="image-options-modal" class="modal-overlay" style="backdrop-filter: blur(8px); background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 10000;">
-        <div class="modal" style="width: 400px; border: 1px solid var(--border);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 style="margin: 0; font-family: 'Space Grotesk', sans-serif;">Export Image</h2>
-                <button class="btn btn-outline" style="padding: 5px;" onclick="closeImageModal()"><i data-lucide="x" style="width: 16px; height: 16px;"></i></button>
-            </div>
-            
-            <div style="margin-bottom: 20px; text-align: center;">
-                <canvas id="image-preview-canvas" style="width: 100%; max-width: 250px; height: auto; border-radius: 8px; background: #000; border: 1px solid var(--border); margin: 0 auto;"></canvas>
-            </div>
-
-            <div style="margin-bottom: 20px; text-align: left;">
-                <label style="display: block; margin-bottom: 8px; color: #888; font-size: 14px;">Background Source</label>
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 10px;">
-                    <button class="bg-source-btn active" data-source="original" onclick="setBgSource('original')">Original</button>
-                    <button class="bg-source-btn" data-source="upload" onclick="setBgSource('upload')">Upload</button>
-                    <button class="bg-source-btn" data-source="ai" onclick="setBgSource('ai')">AI Search</button>
-                    <button class="bg-source-btn" data-source="generate" onclick="setBgSource('generate')">AI Generate</button>
-                </div>
-                <div id="bg-upload-container" style="display: none; margin-bottom: 10px;">
-                    <input type="file" id="bg-upload-input" accept="image/*" style="width: 100%; padding: 10px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 4px; font-family: 'Inter', sans-serif; outline: none;" onchange="handleLocalBgUpload(this)">
-                </div>
-                <div id="bg-ai-container" style="display: none;">
-                    <div style="display: flex; gap: 8px;">
-                        <input type="text" id="bg-ai-prompt" placeholder="Describe the vibe..." style="flex: 1; padding: 10px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 4px; font-family: 'Inter', sans-serif; outline: none;">
-                        <button class="btn btn-outline" onclick="generateAiBg()" title="Search Background">
-                            <i data-lucide="search" style="width: 16px; height: 16px;"></i>
-                        </button>
-                    </div>
-                </div>
-                <div id="bg-generate-container" style="display: none;">
-                    <div style="display: flex; gap: 8px;">
-                        <input type="text" id="bg-generate-prompt" placeholder="Describe the image..." style="flex: 1; padding: 10px; background: var(--bg); border: 1px solid var(--border); color: var(--text); border-radius: 4px; font-family: 'Inter', sans-serif; outline: none;">
-                        <button class="btn btn-outline" onclick="generateAiImage()" title="Generate Image">
-                            <i data-lucide="wand-2" style="width: 16px; height: 16px;"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <div style="margin-bottom: 20px; text-align: left;">
-                <label style="display: block; margin-bottom: 8px; color: #888; font-size: 14px;">Text Styling</label>
-                <div style="display: flex; flex-direction: column; gap: 12px;">
-                    <div>
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                            <span style="font-size: 12px; color: #888;">Font Size</span>
-                            <span id="font-size-val" style="font-size: 12px; color: var(--accent);">100%</span>
-                        </div>
-                        <input type="range" id="font-size-slider" min="50" max="200" value="100" style="width: 100%;" oninput="updateFontSize(this.value)">
-                    </div>
-                    <div style="display: flex; align-items: center; justify-content: space-between;">
-                        <span style="font-size: 12px; color: #888;">Text Color</span>
-                        <input type="color" id="text-color-picker" value="#ffffff" style="width: 40px; height: 40px; border: none; background: none; cursor: pointer;" oninput="updateTextColor(this.value)">
-                    </div>
-                </div>
-            </div>
-
-            <div style="margin-bottom: 20px; text-align: left;">
-                <label style="display: block; margin-bottom: 8px; color: #888; font-size: 14px;">Layout / Aspect Ratio</label>
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
-                    <button class="layout-btn active" data-layout="portrait" onclick="setImageLayout('portrait')">
-                        <div style="width: 20px; height: 30px; border: 2px solid currentColor; margin: 0 auto 5px auto; border-radius: 2px;"></div>
-                        9:16
-                    </button>
-                    <button class="layout-btn" data-layout="square" onclick="setImageLayout('square')">
-                        <div style="width: 25px; height: 25px; border: 2px solid currentColor; margin: 0 auto 5px auto; border-radius: 2px;"></div>
-                        1:1
-                    </button>
-                    <button class="layout-btn" data-layout="landscape" onclick="setImageLayout('landscape')">
-                        <div style="width: 30px; height: 20px; border: 2px solid currentColor; margin: 0 auto 5px auto; border-radius: 2px;"></div>
-                        16:9
-                    </button>
-                </div>
-            </div>
-
-            <div style="margin-bottom: 20px; text-align: left;">
-                <label style="display: block; margin-bottom: 8px; color: #888; font-size: 14px;">Horizontal Alignment</label>
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
-                    <button class="align-btn" data-align="left" onclick="setTextAlign('left')"><i data-lucide="align-left"></i></button>
-                    <button class="align-btn active" data-align="center" onclick="setTextAlign('center')"><i data-lucide="align-center"></i></button>
-                    <button class="align-btn" data-align="right" onclick="setTextAlign('right')"><i data-lucide="align-right"></i></button>
-                </div>
-            </div>
-
-            <div style="margin-bottom: 20px; text-align: left;">
-                <label style="display: block; margin-bottom: 8px; color: #888; font-size: 14px;">Vertical Alignment</label>
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
-                    <button class="valign-btn" data-valign="top" onclick="setTextVAlign('top')"><i data-lucide="arrow-up"></i></button>
-                    <button class="valign-btn active" data-valign="center" onclick="setTextVAlign('center')"><i data-lucide="minus"></i></button>
-                    <button class="valign-btn" data-valign="bottom" onclick="setTextVAlign('bottom')"><i data-lucide="arrow-down"></i></button>
-                </div>
-            </div>
-
-            <div style="margin-bottom: 20px; text-align: left;">
-                <label style="display: block; margin-bottom: 8px; color: #888; font-size: 14px;">Export Resolution</label>
-                <select id="image-export-res" class="input" style="width: 100%;">
-                    <option value="1080">Full HD (1080p Width)</option>
-                    <option value="2160">4K (2160p Width)</option>
-                </select>
-            </div>
-
-            <button id="confirm-image-export-btn" class="btn" style="width: 100%; justify-content: center;" onclick="downloadImage()">
-                <i data-lucide="image" style="width: 18px; height: 18px; margin-right: 8px;"></i> Download JPG
-            </button>
-        </div>
-    </div>
-
-    <script type="module">
         import { GoogleGenAI } from "@google/genai";
 
         // Helper to safely escape strings for inline event handlers
@@ -1085,63 +299,32 @@
         });
 
         // Copy Text Utility
-        function fallbackCopyTextToClipboard(text, btnElement, successHtml) {
-            var textArea = document.createElement("textarea");
-            textArea.value = text;
-            textArea.style.top = "0";
-            textArea.style.left = "0";
-            textArea.style.position = "fixed";
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            try {
-                var successful = document.execCommand('copy');
-                if (successful && btnElement) {
-                    const originalText = btnElement.innerHTML;
-                    btnElement.innerHTML = successHtml;
-                    lucide.createIcons();
-                    setTimeout(() => {
-                        btnElement.innerHTML = originalText;
-                        lucide.createIcons();
-                    }, 2000);
-                }
-            } catch (err) {
-                console.error('Fallback: Oops, unable to copy', err);
-            }
-            document.body.removeChild(textArea);
-        }
-
-        function copyToClipboard(text, btnElement, successHtml) {
-            if (!navigator.clipboard) {
-                fallbackCopyTextToClipboard(text, btnElement, successHtml);
-                return;
-            }
-            navigator.clipboard.writeText(text).then(function() {
-                if (btnElement) {
-                    const originalText = btnElement.innerHTML;
-                    btnElement.innerHTML = successHtml;
-                    lucide.createIcons();
-                    setTimeout(() => {
-                        btnElement.innerHTML = originalText;
-                        lucide.createIcons();
-                    }, 2000);
-                }
-            }, function(err) {
-                console.error('Async: Could not copy text: ', err);
-                fallbackCopyTextToClipboard(text, btnElement, successHtml);
-            });
-        }
-
         window.copyText = function(elementId, btnElement) {
             const el = document.getElementById(elementId);
             const text = el.innerText;
-            const successHtml = '<i data-lucide="check" style="width: 16px; height: 16px; display: inline-block; vertical-align: text-bottom;"></i> Copied!';
-            copyToClipboard(text, btnElement, successHtml);
+            navigator.clipboard.writeText(text).then(() => {
+                if (btnElement) {
+                    const originalText = btnElement.innerHTML;
+                    btnElement.innerHTML = '<i data-lucide="check" style="width: 16px; height: 16px; display: inline-block; vertical-align: text-bottom;"></i> Copied!';
+                    lucide.createIcons();
+                    setTimeout(() => {
+                        btnElement.innerHTML = originalText;
+                        lucide.createIcons();
+                    }, 2000);
+                }
+            });
         };
 
         window.copySpecificText = function(btn, text) {
-            const successHtml = '<i data-lucide="check" style="width: 16px; height: 16px; display: inline-block; vertical-align: text-bottom;"></i> Copied';
-            copyToClipboard(text, btn, successHtml);
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i data-lucide="check" style="width: 16px; height: 16px; display: inline-block; vertical-align: text-bottom;"></i> Copied';
+                lucide.createIcons();
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    lucide.createIcons();
+                }, 2000);
+            });
         }
 
         // Save Content Utility
@@ -1195,8 +378,8 @@
                             <div style="background: #111; border: 1px solid var(--border); padding: 15px; border-radius: 4px; margin-bottom: 10px;">
                                 <div style="white-space: pre-wrap; font-size: 14px; margin-bottom: 10px;">${item}</div>
                                 <div style="display: flex; gap: 10px;">
-                                    <button class="btn" style="padding: 8px 16px; font-size: 14px; display: inline-flex; align-items: center; gap: 6px;" onclick="copySpecificText(this, '${escapeForJsAndHtml(item)}')"><i data-lucide="copy" style="width: 16px; height: 16px;"></i> Copy</button>
-                                    <button class="btn btn-outline" style="padding: 8px 16px; font-size: 14px; color: #ff4444; border-color: #ff4444;" onclick="deleteSavedContent('${t.key}', ${index})">Delete</button>
+                                    <button class="btn btn-outline" style="padding: 5px 10px; font-size: 12px;" onclick="copySpecificText(this, '${escapeForJsAndHtml(item)}')">Copy</button>
+                                    <button class="btn btn-outline" style="padding: 5px 10px; font-size: 12px; color: #ff4444; border-color: #ff4444;" onclick="deleteSavedContent('${t.key}', ${index})">Delete</button>
                                 </div>
                             </div>
                         `;
@@ -1385,8 +568,8 @@
                     contents: prompt,
                 });
                 
-                let jsonStr = extractJson(response.text);
-                const niches = ensureArray(JSON.parse(jsonStr));
+                let jsonStr = response.text.replace(/```json/g, '').replace(/```/g, '').trim();
+                const niches = JSON.parse(jsonStr);
                 
                 container.innerHTML = '';
                 niches.forEach(niche => {
@@ -1500,7 +683,7 @@
                     contents: prompt,
                 });
                 
-                let jsonStr = extractJson(response.text);
+                let jsonStr = response.text.replace(/```json/g, '').replace(/```/g, '').trim();
                 const data = JSON.parse(jsonStr);
                 quotes = data.quotes;
                 if (data.palettes && data.palettes.length > 0) {
@@ -1523,11 +706,6 @@
                 });
                 paletteContainer.innerHTML = paletteHtml;
             }
-
-            window.currentQuotes = quotes;
-            window.currentPalettes = palettes;
-            document.getElementById('ai-pick-section').style.display = 'block';
-            document.getElementById('ai-pick-result').style.display = 'none';
 
             container.innerHTML = '';
 
@@ -1596,8 +774,8 @@
                     contents: prompt,
                 });
                 
-                let jsonStr = extractJson(response.text);
-                const slides = ensureArray(JSON.parse(jsonStr));
+                let jsonStr = response.text.replace(/```json/g, '').replace(/```/g, '').trim();
+                const slides = JSON.parse(jsonStr);
                 generatedCarouselSlides = slides;
                 localStorage.setItem('cc_last_carousel', JSON.stringify(slides));
                 
@@ -1677,8 +855,8 @@
                     contents: prompt,
                 });
                 
-                let jsonStr = extractJson(response.text);
-                const captions = ensureArray(JSON.parse(jsonStr));
+                let jsonStr = response.text.replace(/```json/g, '').replace(/```/g, '').trim();
+                const captions = JSON.parse(jsonStr);
                 
                 container.innerHTML = '';
                 captions.forEach(cap => {
@@ -1687,8 +865,8 @@
                             <strong style="color: var(--accent);">${cap.type} Caption:</strong><br><br>${cap.text.replace(/\n/g, '<br>')}
                             <br><br>
                             <div style="display: flex; gap: 10px;">
-                                <button class="btn" style="padding: 8px 16px; font-size: 14px; display: inline-flex; align-items: center; gap: 6px;" onclick="copySpecificText(this, '${escapeForJsAndHtml(cap.text)}')"><i data-lucide="copy" style="width: 16px; height: 16px;"></i> Copy</button>
-                                <button class="btn btn-outline" style="padding: 8px 16px; font-size: 14px;" onclick="saveContent(this, 'captions', '${escapeForJsAndHtml(cap.text)}')">Save</button>
+                                <button class="btn btn-outline" style="padding: 5px 10px; font-size: 12px;" onclick="copySpecificText(this, '${escapeForJsAndHtml(cap.text)}')">Copy</button>
+                                <button class="btn btn-outline" style="padding: 5px 10px; font-size: 12px;" onclick="saveContent(this, 'captions', '${escapeForJsAndHtml(cap.text)}')">Save</button>
                             </div>
                         </div>
                     `;
@@ -1719,8 +897,8 @@
                             <strong style="color: var(--accent);">${cap.type} Caption:</strong><br><br>${cap.text.replace(/\n/g, '<br>')}
                             <br><br>
                             <div style="display: flex; gap: 10px;">
-                                <button class="btn" style="padding: 8px 16px; font-size: 14px; display: inline-flex; align-items: center; gap: 6px;" onclick="copySpecificText(this, '${escapeForJsAndHtml(cap.text)}')"><i data-lucide="copy" style="width: 16px; height: 16px;"></i> Copy</button>
-                                <button class="btn btn-outline" style="padding: 8px 16px; font-size: 14px;" onclick="saveContent(this, 'captions', '${escapeForJsAndHtml(cap.text)}')">Save</button>
+                                <button class="btn btn-outline" style="padding: 5px 10px; font-size: 12px;" onclick="copySpecificText(this, '${escapeForJsAndHtml(cap.text)}')">Copy</button>
+                                <button class="btn btn-outline" style="padding: 5px 10px; font-size: 12px;" onclick="saveContent(this, 'captions', '${escapeForJsAndHtml(cap.text)}')">Save</button>
                             </div>
                         </div>
                     `;
@@ -1742,8 +920,8 @@
                     contents: prompt,
                 });
                 
-                let jsonStr = extractJson(response.text);
-                const tags = ensureArray(JSON.parse(jsonStr));
+                let jsonStr = response.text.replace(/```json/g, '').replace(/```/g, '').trim();
+                const tags = JSON.parse(jsonStr);
                 container.innerText = tags.join(' ');
             } catch (e) {
                 handleAiError(e, "Falling back to hardcoded hashtags.");
@@ -1784,8 +962,8 @@
                     contents: prompt,
                 });
                 
-                let jsonStr = extractJson(response.text);
-                const scripts = ensureArray(JSON.parse(jsonStr));
+                let jsonStr = response.text.replace(/```json/g, '').replace(/```/g, '').trim();
+                const scripts = JSON.parse(jsonStr);
                 
                 let html = '';
                 scripts.forEach((script) => {
@@ -1799,7 +977,7 @@
                             <strong>CTA:</strong> ${script.cta}<br><br>
                             <strong>Audio:</strong> ${script.audio}<br><br>
                             <div style="display: flex; gap: 10px;">
-                                <button class="btn" style="padding: 8px 16px; font-size: 14px; display: inline-flex; align-items: center; gap: 6px;" onclick="copySpecificText(this, '${escapeForJsAndHtml(scriptText)}')"><i data-lucide="copy" style="width: 16px; height: 16px;"></i> Copy Script</button>
+                                <button class="btn btn-outline" style="padding: 5px 10px; font-size: 12px;" onclick="copySpecificText(this, '${escapeForJsAndHtml(scriptText)}')">Copy Script</button>
                             </div>
                         </div>
                     `;
@@ -1820,7 +998,7 @@
                         <strong>Audio:</strong> Trending lo-fi or phonk beat.
                         <br><br>
                         <div style="display: flex; gap: 10px;">
-                            <button class="btn" style="padding: 8px 16px; font-size: 14px; display: inline-flex; align-items: center; gap: 6px;" onclick="copySpecificText(this, '${escapeForJsAndHtml(scriptText1)}')"><i data-lucide="copy" style="width: 16px; height: 16px;"></i> Copy Script</button>
+                            <button class="btn btn-outline" style="padding: 5px 10px; font-size: 12px;" onclick="copySpecificText(this, '${escapeForJsAndHtml(scriptText1)}')">Copy Script</button>
                         </div>
                     </div>
                     <div class="caption-box">
@@ -1832,7 +1010,7 @@
                         <strong>Audio:</strong> Upbeat, fast-paced instrumental.
                         <br><br>
                         <div style="display: flex; gap: 10px;">
-                            <button class="btn" style="padding: 8px 16px; font-size: 14px; display: inline-flex; align-items: center; gap: 6px;" onclick="copySpecificText(this, '${escapeForJsAndHtml(scriptText2)}')"><i data-lucide="copy" style="width: 16px; height: 16px;"></i> Copy Script</button>
+                            <button class="btn btn-outline" style="padding: 5px 10px; font-size: 12px;" onclick="copySpecificText(this, '${escapeForJsAndHtml(scriptText2)}')">Copy Script</button>
                         </div>
                     </div>
                 `;
@@ -2143,9 +1321,6 @@
                     document.getElementById('video-music-style').value = preset.musicStyle;
                     document.getElementById('internet-audio-section').style.display = preset.musicStyle === 'internet' ? 'block' : 'none';
                 }
-                if (preset.internetAudioQuery !== undefined) document.getElementById('internet-audio-query').value = preset.internetAudioQuery;
-                if (preset.internetAudioUrl !== undefined) document.getElementById('selected-internet-audio-url').value = preset.internetAudioUrl;
-                
                 if (document.getElementById('video-preview-canvas').style.display !== 'none') startVideoPreview();
             }
         };
@@ -2158,9 +1333,7 @@
                 animStyle: document.getElementById('video-anim-style').value,
                 duration: document.getElementById('video-duration').value,
                 customDuration: document.getElementById('video-custom-duration').value,
-                musicStyle: document.getElementById('video-music-style').value,
-                internetAudioQuery: document.getElementById('internet-audio-query').value,
-                internetAudioUrl: document.getElementById('selected-internet-audio-url').value
+                musicStyle: document.getElementById('video-music-style').value
             };
             localStorage.setItem('cc_video_presets', JSON.stringify(presets));
             loadVideoPresets();
@@ -3498,25 +2671,6 @@
             }, 3000);
         };
 
-        function extractJson(text) {
-            if (!text) return '[]';
-            let str = text.replace(/```json/g, '').replace(/```/g, '').trim();
-            const match = str.match(/(\[[\s\S]*\]|\{[\s\S]*\})/);
-            return match ? match[0] : str;
-        }
-
-        function ensureArray(parsedJson) {
-            if (Array.isArray(parsedJson)) return parsedJson;
-            if (parsedJson && typeof parsedJson === 'object') {
-                for (const key in parsedJson) {
-                    if (Array.isArray(parsedJson[key])) {
-                        return parsedJson[key];
-                    }
-                }
-            }
-            return parsedJson ? [parsedJson] : [];
-        }
-
         function handleAiError(e, fallbackMessage) {
             console.error(e);
             let isQuota = false;
@@ -3570,7 +2724,7 @@
                         brand: baseSlide.brand,
                         bgId: baseSlide.bgId,
                         bgOverlayOpacity: baseSlide.bgOverlayOpacity,
-                        titleFontSize: 21,
+                        titleFontSize: baseSlide.titleFontSize,
                         titleColor: baseSlide.titleColor,
                         titleFontFamily: baseSlide.titleFontFamily,
                         titleEffect: baseSlide.titleEffect,
@@ -4001,132 +3155,8 @@
             lucide.createIcons();
         }
 
-        // --- AI PICK LOGIC ---
-        let selectedAiPlatform = null;
-
-        window.selectAiPickPlatform = function(btn) {
-            document.querySelectorAll('.ai-pick-platform-btn').forEach(b => {
-                b.classList.add('btn-outline');
-            });
-            btn.classList.remove('btn-outline');
-            
-            selectedAiPlatform = btn.getAttribute('data-platform');
-            document.getElementById('get-ai-pick-btn').style.display = 'flex';
-        };
-
-        window.getAiPick = async function() {
-            if (!selectedAiPlatform) {
-                showToast("Please select a platform first.", "error");
-                return;
-            }
-            if (!window.currentQuotes || window.currentQuotes.length === 0) {
-                showToast("Please generate quotes first.", "error");
-                return;
-            }
-            
-            const btn = document.getElementById('get-ai-pick-btn');
-            const loading = document.getElementById('ai-pick-loading');
-            const resultDiv = document.getElementById('ai-pick-result');
-            
-            btn.style.display = 'none';
-            loading.style.display = 'block';
-            resultDiv.style.display = 'none';
-            
-            try {
-                const quotesList = window.currentQuotes.map((q, i) => `[ID: ${i}] "${q.text}" - ${q.author}`).join('\n');
-                
-                const prompt = `You are an expert social media psychologist. Analyze the following quotes and pick the BEST ONE for ${selectedAiPlatform}.
-                
-                Psychology Guidelines:
-                - TikTok: Prioritize quotes that trigger novelty bias, pattern interrupts, or FOMO. Short, punchy, emotionally charged. Best for quotes that feel like a revelation or challenge a belief.
-                - Instagram: Prioritize quotes that evoke aspirational identity, aesthetic resonance, and social proof triggers. Quotes that make people want to share because it reflects who they want to be.
-                - YouTube: Prioritize quotes that create open loops or intellectual curiosity gaps. Longer, thought-provoking, good as a hook or end-card. Best for quotes that make the viewer want to know more.
-                
-                Quotes to analyze:
-                ${quotesList}
-                
-                Return ONLY a valid JSON object with this exact structure:
-                {
-                    "chosen_quote_id": 0, // The numeric ID of the chosen quote
-                    "reason": "1-2 sentences explaining why this quote was chosen based on the psychology guidelines.",
-                    "psychology_trigger": "The specific psychological trigger activated (e.g., 'Pattern interrupt', 'Identity signal', 'Curiosity gap')",
-                    "suggested_caption": "A suggested caption or hook line tailored to ${selectedAiPlatform}"
-                }
-                No markdown, no backticks.`;
-
-                const response = await ai.models.generateContent({
-                    model: 'gemini-3-flash-preview',
-                    contents: prompt,
-                });
-                
-                let jsonStr = response.text;
-                const jsonMatch = jsonStr.match(/\{[\s\S]*\}/);
-                if (jsonMatch) {
-                    jsonStr = jsonMatch[0];
-                } else {
-                    jsonStr = jsonStr.replace(/```json/g, '').replace(/```/g, '').trim();
-                }
-                const data = JSON.parse(jsonStr);
-                
-                let chosenQuote = window.currentQuotes[data.chosen_quote_id];
-                if (!chosenQuote) {
-                    data.chosen_quote_id = 0;
-                    chosenQuote = window.currentQuotes[0];
-                }
-                const palette = window.currentPalettes ? window.currentPalettes[data.chosen_quote_id % window.currentPalettes.length] : { background: '#111', text: '#fff' };
-                
-                resultDiv.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
-                        <h4 style="color: var(--accent); margin: 0;">Top Pick for ${selectedAiPlatform}</h4>
-                        <span style="background: rgba(255, 255, 255, 0.1); padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 5px;">
-                            <i data-lucide="brain" style="width: 14px; height: 14px;"></i> ${data.psychology_trigger}
-                        </span>
-                    </div>
-                    
-                    <p style="font-size: 14px; line-height: 1.5; margin-bottom: 15px; color: #ddd;">
-                        <strong>Why it works:</strong> ${data.reason}
-                    </p>
-                    
-                    <div style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px dashed #444;">
-                        <strong style="color: #aaa; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px;">Suggested Caption</strong>
-                        <p style="font-size: 14px; margin: 0;">${data.suggested_caption}</p>
-                        <button class="btn btn-outline" style="padding: 4px 8px; font-size: 12px; margin-top: 10px;" onclick="copySpecificText(this, '${escapeForJsAndHtml(data.suggested_caption)}')">Copy Caption</button>
-                    </div>
-                    
-                    <div class="quote-card" style="background: ${palette.background}; color: ${palette.text}; border: 1px solid #333; margin: 0; width: 100%;">
-                        <div style="position: absolute; top: 10px; right: 10px; display: flex; gap: 5px;">
-                            <button class="copy-btn" style="position: static; color: ${palette.text}; border-color: ${palette.text}; opacity: 0.9; display: flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500;" onclick="startVideoExport(this, '${escapeForJsAndHtml(chosenQuote.text)}', '${escapeForJsAndHtml(chosenQuote.author)}')" title="Export as Video">
-                                <i data-lucide="video" style="width: 14px; height: 14px;"></i> Video
-                            </button>
-                            <button class="copy-btn" style="position: static; color: ${palette.text}; border-color: ${palette.text}; opacity: 0.9; display: flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 500;" onclick="startImageExport(this, '${escapeForJsAndHtml(chosenQuote.text)}', '${escapeForJsAndHtml(chosenQuote.author)}')" title="Export as Image">
-                                <i data-lucide="image" style="width: 14px; height: 14px;"></i> Image
-                            </button>
-                        </div>
-                        <div class="quote-text" style="color: ${palette.text};">"${chosenQuote.text}"</div>
-                        <div class="quote-author" style="color: ${palette.text}; opacity: 0.8;">— ${chosenQuote.author}</div>
-                    </div>
-                    
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button class="btn btn-outline" onclick="document.getElementById('get-ai-pick-btn').style.display='flex'; document.getElementById('ai-pick-result').style.display='none';">Pick Again / Try Another Platform</button>
-                    </div>
-                `;
-                
-                loading.style.display = 'none';
-                resultDiv.style.display = 'block';
-                lucide.createIcons();
-                
-            } catch (e) {
-                console.error("AI Pick Error:", e);
-                loading.style.display = 'none';
-                btn.style.display = 'flex';
-                showToast("Failed to get AI Pick. Please try again.", "error");
-            }
-        };
-
         // Init
         initStorage();
         initCarouselCoverBuilder();
 
-    </script>
-</body>
-</html>
+    
